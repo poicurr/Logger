@@ -36,12 +36,12 @@ using logger::LogLevel;
 int main() {
   std::ofstream file("./test.log", std::ios::trunc);
 
-  Logger::SetOutputStream(file);
-  Logger::SetLevel(LogLevel::Warn);
-  Logger::EnableTimestamp(true);
+  Logger::setOutputStream(file);
+  Logger::setLevel(LogLevel::Warn);
+  Logger::enableTimestamp(true);
 
-  Logger::Info("Ignored message");
-  Logger::Error("An error {}", 42);
+  Logger::info("Ignored message");
+  Logger::error("An error {}", 42);
 }
 ```
 
