@@ -25,85 +25,85 @@ class Logger {
 public:
   Logger() = delete;
 
-  static void SetOutputStream(std::ostream &stream) {
+  static void setOutputStream(std::ostream &stream) {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_outputStream = &stream;
   }
 
-  static void SetLevel(LogLevel level) {
+  static void setLevel(LogLevel level) {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_level = level;
   }
 
-  static LogLevel GetLevel() {
+  static LogLevel getLevel() {
     std::lock_guard<std::mutex> guard(m_mutex);
     return m_level;
   }
 
-  static void EnableTimestamp(bool enable) {
+  static void enableTimestamp(bool enable) {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_timestampEnabled = enable;
   }
 
-  static bool IsTimestampEnabled() {
+  static bool isTimestampEnabled() {
     std::lock_guard<std::mutex> guard(m_mutex);
     return m_timestampEnabled;
   }
 
   template <typename... Args>
-  static void Log(LogLevel level, std::string_view format,
+  static void log(LogLevel level, std::string_view format,
                   const Args &...args) {
-    if (!ShouldLog(level))
+    if (!shouldLog(level))
       return;
 
-    const std::string message = FormatMessage(format, args...);
+    const std::string message = formatMessage(format, args...);
 
     std::lock_guard<std::mutex> guard(m_mutex);
     auto &stream = *m_outputStream;
     if (m_timestampEnabled) {
-      stream << FormatTimestamp() << ' ';
+      stream << formatTimestamp() << ' ';
     }
-    stream << '[' << LevelToString(level) << "] " << message << '\n';
+    stream << '[' << levelStr(level) << "] " << message << '\n';
     stream.flush();
   }
 
   template <typename... Args>
-  static void Trace(std::string_view format, const Args &...args) {
-    Log(LogLevel::Trace, format, args...);
+  static void trace(std::string_view format, const Args &...args) {
+    log(LogLevel::Trace, format, args...);
   }
 
   template <typename... Args>
-  static void Debug(std::string_view format, const Args &...args) {
-    Log(LogLevel::Debug, format, args...);
+  static void debug(std::string_view format, const Args &...args) {
+    log(LogLevel::Debug, format, args...);
   }
 
   template <typename... Args>
-  static void Info(std::string_view format, const Args &...args) {
-    Log(LogLevel::Info, format, args...);
+  static void info(std::string_view format, const Args &...args) {
+    log(LogLevel::Info, format, args...);
   }
 
   template <typename... Args>
-  static void Warn(std::string_view format, const Args &...args) {
-    Log(LogLevel::Warn, format, args...);
+  static void warn(std::string_view format, const Args &...args) {
+    log(LogLevel::Warn, format, args...);
   }
 
   template <typename... Args>
-  static void Error(std::string_view format, const Args &...args) {
-    Log(LogLevel::Error, format, args...);
+  static void error(std::string_view format, const Args &...args) {
+    log(LogLevel::Error, format, args...);
   }
 
   template <typename... Args>
-  static void Fatal(std::string_view format, const Args &...args) {
-    Log(LogLevel::Fatal, format, args...);
+  static void fatal(std::string_view format, const Args &...args) {
+    log(LogLevel::Fatal, format, args...);
   }
 
 private:
-  static bool ShouldLog(LogLevel level) {
+  static bool shouldLog(LogLevel level) {
     std::lock_guard<std::mutex> guard(m_mutex);
     return static_cast<int>(level) >= static_cast<int>(m_level);
   }
 
-  static std::string FormatTimestamp() {
+  static std::string formatTimestamp() {
     using clock = std::chrono::system_clock;
     const auto now = clock::now();
     const std::time_t time = clock::to_time_t(now);
@@ -121,7 +121,7 @@ private:
     return stream.str();
   }
 
-  static std::string_view LevelToString(LogLevel level) {
+  static std::string_view levelStr(LogLevel level) {
     switch (level) {
     case LogLevel::Trace:
       return "TRACE";
@@ -140,15 +140,15 @@ private:
   }
 
   template <typename... Args>
-  static std::string FormatMessage(std::string_view format,
+  static std::string formatMessage(std::string_view format,
                                    const Args &...args) {
     std::ostringstream stream;
-    AppendFormatted(stream, format, args...);
+    appendFormatted(stream, format, args...);
     return stream.str();
   }
 
   template <typename Arg, typename... Rest>
-  static void AppendFormatted(std::ostringstream &stream,
+  static void appendFormatted(std::ostringstream &stream,
                               std::string_view format, const Arg &arg,
                               const Rest &...rest) {
     const std::size_t placeholder = format.find("{}");
@@ -159,10 +159,10 @@ private:
 
     stream << format.substr(0, placeholder);
     stream << arg;
-    AppendFormatted(stream, format.substr(placeholder + 2), rest...);
+    appendFormatted(stream, format.substr(placeholder + 2), rest...);
   }
 
-  static void AppendFormatted(std::ostringstream &stream,
+  static void appendFormatted(std::ostringstream &stream,
                               std::string_view text) {
     stream << text;
   }

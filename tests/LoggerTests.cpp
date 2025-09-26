@@ -16,12 +16,12 @@ using logger::LogLevel;
 int main() {
   {
     std::ostringstream stream;
-    Logger::SetOutputStream(stream);
-    Logger::SetLevel(LogLevel::Trace);
-    Logger::EnableTimestamp(false);
+    Logger::setOutputStream(stream);
+    Logger::setLevel(LogLevel::Trace);
+    Logger::enableTimestamp(false);
 
-    Logger::Info("Hello {}", "world");
-    Logger::SetOutputStream(std::clog);
+    Logger::info("Hello {}", "world");
+    Logger::setOutputStream(std::clog);
 
     const std::string output = stream.str();
     assert(output.find("[INFO] Hello world") != std::string::npos);
@@ -30,13 +30,13 @@ int main() {
 
   {
     std::ostringstream stream;
-    Logger::SetOutputStream(stream);
-    Logger::SetLevel(LogLevel::Warn);
-    Logger::EnableTimestamp(false);
+    Logger::setOutputStream(stream);
+    Logger::setLevel(LogLevel::Warn);
+    Logger::enableTimestamp(false);
 
-    Logger::Info("Ignored message");
-    Logger::Error("An error {}", 42);
-    Logger::SetOutputStream(std::clog);
+    Logger::info("Ignored message");
+    Logger::error("An error {}", 42);
+    Logger::setOutputStream(std::clog);
 
     const std::string output = stream.str();
     assert(output.find("Ignored message") == std::string::npos);
@@ -45,12 +45,12 @@ int main() {
 
   {
     std::ostringstream stream;
-    Logger::SetOutputStream(stream);
-    Logger::SetLevel(LogLevel::Debug);
-    Logger::EnableTimestamp(true);
+    Logger::setOutputStream(stream);
+    Logger::setLevel(LogLevel::Debug);
+    Logger::enableTimestamp(true);
 
-    Logger::Debug("Coordinates {} {}", 10, 20);
-    Logger::SetOutputStream(std::clog);
+    Logger::debug("Coordinates {} {}", 10, 20);
+    Logger::setOutputStream(std::clog);
 
     const std::string output = stream.str();
     assert(!output.empty() &&
@@ -69,16 +69,16 @@ int main() {
       std::ofstream file(logPath, std::ios::trunc);
       assert(file.is_open());
 
-      Logger::SetOutputStream(file);
-      Logger::SetLevel(LogLevel::Info);
-      Logger::EnableTimestamp(false);
+      Logger::setOutputStream(file);
+      Logger::setLevel(LogLevel::Info);
+      Logger::enableTimestamp(false);
 
       std::vector<std::thread> workers;
       workers.reserve(threadCount);
       for (std::size_t i = 0; i < threadCount; ++i) {
         workers.emplace_back([i, messagesPerThread]() {
           for (std::size_t j = 0; j < messagesPerThread; ++j) {
-            Logger::Info("thread {} message {}", i, j);
+            Logger::info("thread {} message {}", i, j);
           }
         });
       }
@@ -87,7 +87,7 @@ int main() {
         worker.join();
       }
 
-      Logger::SetOutputStream(std::clog);
+      Logger::setOutputStream(std::clog);
     }
 
     std::ifstream input(logPath);
@@ -124,9 +124,9 @@ int main() {
     }
   }
 
-  Logger::SetOutputStream(std::clog);
-  Logger::SetLevel(LogLevel::Info);
-  Logger::EnableTimestamp(true);
+  Logger::setOutputStream(std::clog);
+  Logger::setLevel(LogLevel::Info);
+  Logger::enableTimestamp(true);
 
   return 0;
 }
