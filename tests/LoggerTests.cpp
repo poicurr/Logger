@@ -32,7 +32,7 @@ int main() {
     std::ostringstream stream;
     Logger::setOutputStream(stream);
     Logger::setLevel(LogLevel::Warn);
-    Logger::enableTimestamp(false);
+    Logger::enableTimestamp(true);
 
     Logger::info("Ignored message");
     Logger::error("An error {}", 42);
@@ -41,6 +41,7 @@ int main() {
     const std::string output = stream.str();
     assert(output.find("Ignored message") == std::string::npos);
     assert(output.find("[ERROR] An error 42") != std::string::npos);
+    std::cout << output << std::endl;
   }
 
   {

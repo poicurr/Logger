@@ -42,6 +42,7 @@ int main() {
 
   Logger::info("Ignored message");
   Logger::error("An error {}", 42);
+  // -> "2025-09-26 12:53:53.122 [ERROR] An error 42"
 }
 ```
 

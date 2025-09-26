@@ -115,9 +115,13 @@ private:
     std::tm localTime{};
     localtime_r(&time, &localTime);
 #endif
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                  now.time_since_epoch()) %
+              1000;
 
     std::ostringstream stream;
     stream << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+    stream << '.' << std::setw(3) << std::setfill('0') << ms.count();
     return stream.str();
   }
 
