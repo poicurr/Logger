@@ -26,28 +26,28 @@ public:
   Logger() = delete;
 
   static void setOutputStream(std::ostream &stream) {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    m_outputStream = &stream;
+    std::lock_guard<std::mutex> guard(s_mutex);
+    s_outputStream = &stream;
   }
 
   static void setLevel(LogLevel level) {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    m_level = level;
+    std::lock_guard<std::mutex> guard(s_mutex);
+    s_level = level;
   }
 
   static LogLevel getLevel() {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    return m_level;
+    std::lock_guard<std::mutex> guard(s_mutex);
+    return s_level;
   }
 
   static void enableTimestamp(bool enable) {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    m_timestampEnabled = enable;
+    std::lock_guard<std::mutex> guard(s_mutex);
+    s_timestampEnabled = enable;
   }
 
   static bool isTimestampEnabled() {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    return m_timestampEnabled;
+    std::lock_guard<std::mutex> guard(s_mutex);
+    return s_timestampEnabled;
   }
 
   template <typename... Args>
@@ -58,9 +58,9 @@ public:
 
     const std::string message = formatMessage(format, args...);
 
-    std::lock_guard<std::mutex> guard(m_mutex);
-    auto &stream = *m_outputStream;
-    if (m_timestampEnabled) {
+    std::lock_guard<std::mutex> guard(s_mutex);
+    auto &stream = *s_outputStream;
+    if (s_timestampEnabled) {
       stream << formatTimestamp() << ' ';
     }
     stream << '[' << levelStr(level) << "] " << message << '\n';
@@ -99,8 +99,8 @@ public:
 
 private:
   static bool shouldLog(LogLevel level) {
-    std::lock_guard<std::mutex> guard(m_mutex);
-    return static_cast<int>(level) >= static_cast<int>(m_level);
+    std::lock_guard<std::mutex> guard(s_mutex);
+    return static_cast<int>(level) >= static_cast<int>(s_level);
   }
 
   static std::string formatTimestamp() {
@@ -167,10 +167,10 @@ private:
     stream << text;
   }
 
-  inline static std::ostream *m_outputStream = &std::clog;
-  inline static LogLevel m_level = LogLevel::Info;
-  inline static bool m_timestampEnabled = true;
-  inline static std::mutex m_mutex;
+  inline static std::ostream *s_outputStream = &std::clog;
+  inline static LogLevel s_level = LogLevel::Info;
+  inline static bool s_timestampEnabled = true;
+  inline static std::mutex s_mutex;
 };
 
 } // namespace logger
